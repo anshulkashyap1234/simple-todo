@@ -22,14 +22,14 @@ def add():
 
     # check if name is not empty
     if name == "":
-        return False
+        return jsonify(False)
     else:
         #if data is not empty then add the data in database
         try:
             db.add_data(name, user_data)
-            return True
+            return jsonify(True)
         except:
-            return False
+            return jsonify(False)
         
 
 #this router is use for delete data from database
@@ -39,9 +39,9 @@ def delete():
     # data will be identify using name in database
     try:
         db.delete_data(name)
-        return True
+        return jsonify(True)
     except:
-        return False
+        return jsonify(False)
 
 
 
@@ -60,10 +60,10 @@ def update():
     try:
         # function of db to update data
         db.update_data(update_name,detail,old_name)
-        return True
+        return jsonify(True)
     except:
        
-        return False
+        return jsonify(False)
 
 # to show data 
 @app.route('/api/todo')
