@@ -17,7 +17,28 @@ function hideShows() {
     x.style.display = "flex";
 }
 
+// when click outside the form then form will close
+document.addEventListener("click", function (evt) {
+    let flyoutEl = document.getElementById('card_section'),
+        targetEl = evt.target; // clicked element     
+    let flyoutE2 = document.getElementById('card_section1'),
+        targetE2 = evt.target; // clicked element     
+    if (targetEl == flyoutEl) {
 
+        flyoutEl.style.display = 'none'
+
+    }
+    if (targetE2 == flyoutE2) {
+
+        flyoutE2.style.display = 'none'
+
+    }
+
+
+
+
+
+});
 
 
 
@@ -35,12 +56,20 @@ function getdata(e) {
     xhr.open('post', '../add', true)
     xhr.setRequestHeader('Content-type', 'application/json')
     xhr.onload = function () {
-//when the data will be loaded then the form section will be closed
+        //when the data will be loaded then the form section will be closed
         flyoutEl = document.getElementById('card_section');
         flyoutEl.style.display = "none";
-        console.log('reached')
+
+        resp = this.responseText
+        
+        if (resp) {
+            displaytask(name, userData)
+
+        }
+        else {
+            alert('task will not added')
+        }
         //this function is use to create dynamic html content by using two parameter name and data
-        displaytask(name, userData)
         // this is use to reset the form and not to store privous data
         var element = document.getElementById('postform');
         element.reset();
@@ -58,7 +87,7 @@ function displaytask(name, userData) {
     var container = document.querySelector('.container_section');
 
 
-// create dynamic content
+    // create dynamic content
     let p = `
     <div class="container">
     <h1 id="name-${i}">${name}</h1>
@@ -93,21 +122,26 @@ function displaytask(name, userData) {
         </div>
     
 `;
-// insert dynamic content in container
+    // insert dynamic content in container
     container.insertAdjacentHTML("beforeend", p)
-// this function is use to element using id to element
+    // this function is use to element using id to element
     document.querySelector('#delete-' + i)
         .addEventListener('click', function () {
             let removeE = this.parentNode;
             let name = this.value
+            
+            var conf = confirm(`did you want to delete -> ${name}`)
             // deldata function is send to a http request to server to delelte the data from database
-            deldata(name)
+            if (conf == true) {
+
+                deldata(name)
+                container.removeChild(removeE)
+            }
             // this will remove child from the container
-            container.removeChild(removeE)
 
 
         })
-        // this is use to for getting done a task to higlight the task that will be done
+    // this is use to for getting done a task to higlight the task that will be done
     document.querySelector('#check-' + i)
         .addEventListener('click', function () {
             console.log(this.parentNode)
@@ -116,20 +150,20 @@ function displaytask(name, userData) {
             this.style.backgroundColor = 'blue'
 
         })
-        // this funtion is use to update the element
+    // this funtion is use to update the element
     document.querySelector('#update-' + i)
         .addEventListener('click', function () {
             conts = this;
             data = this.value;
             data = data.split(",");
-            console.log(conts)
+            
             document.getElementById('task_name').value = data[0];
             document.getElementById('task_details').innerHTML = data[1];
 
 
 
         });
-        // this use to send data to sever and changes are done in database
+    // this use to send data to sever and changes are done in database
     document.querySelector('#updatebtn')
         .addEventListener('click', function (e) {
             //console.log('#update-' + i)
@@ -150,8 +184,20 @@ function displaytask(name, userData) {
 
                 flyoutEl = document.getElementById('card_section1');
                 flyoutEl.style.display = "none";
+                let resp = this.responseText
+                if(resp){
 
-
+                    let removeE = conts.parentNode;
+    
+                    deldata(oldname)
+                    container.removeChild(removeE)
+                    displaytask(name, userData)
+                }
+                else{
+                    alert("task will not updated")
+                }
+               
+               
 
                 var element = document.getElementById('updateform');
                 element.reset();
@@ -160,11 +206,8 @@ function displaytask(name, userData) {
                 //document.getElementById('prediction').innerHTML= this.responseText;
             }
             xhrs.send(JSON.stringify(params));
-            let removeE = conts.parentNode;
-
-            deldata(oldname)
-            container.removeChild(removeE)
-            displaytask(name, userData)
+           
+               
 
 
         });
@@ -204,8 +247,8 @@ window.onload = function () {
     xhrr.setRequestHeader('Content-type', 'application/json')
     xhrr.onload = function () {
 
-
-        console.log('reached')
+        
+  
         let arr = JSON.parse(this.responseText)
 
         for (var i = 0; i < arr.length; i++) {
